@@ -1,8 +1,75 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import './App.css';
 import Project from "./Project";
 import Addproject from "./Addproject";
+import getWeb3 from "./getWeb3";
+import CrowdfundContract from "./contracts/Crowdfund.json"
+
 function App(){
+const[currentAccount,setCurrentAccount] = useState('');
+const[crowdfund, setCrowdfund] = useState({});
+const[projects,setProjects] = useState([]);
+
+const getweb3data = async()=>{
+  const web3 =  await getWeb3();
+  //get the address from metamask
+  const accounts = await web3.eth.getAccounts();
+  console.log(accounts);
+  //get the network id 
+  const networkid = await web3.eth.net.getId();
+  console.log(networkid);
+  const networkdeployed = CrowdfundContract.networks[networkid];
+  console.log(networkdeployed.address);
+  // get the contract instance
+  const instance = await new web3.eth.Contract(CrowdfundContract.abi,networkdeployed.address)
+  console.log(instance);
+  setCurrentAccount(accounts[0]);
+  setCrowdfund({...instance});
+  const result =  await instance.methods.getprojectlist().call();
+  console.log(result);
+  const projectlist =[];
+  for (let  i =1;i<=result;i++){
+   const  project = await instance.methods.getprojectdetails(i).call()
+      projectlist.push(project);
+    }
+    setProjects(projectlist);
+  
+  console.log(crowdfund);
+
+}
+
+const addproject = async(title,details,goal,duedate)=>{
+  try{
+ const result =  await crowdfund.methods.addproject(title,details,goal,duedate).send({from:currentAccount})
+console.log(result);
+// alert(result.events.title);
+console.log(crowdfund);
+}
+catch(error){
+  alert("console")
+  console.log(error);
+}
+
+}
+const handlefund = async(id,value)=>{
+  try{
+    await crowdfund.methods.fundproject(id).send({from:currentAccount,value:value});
+
+  }
+  catch(error){
+    console.log(error);
+  }
+}
+const balancecheck= async()=>{
+  // event.preventDefault();
+  const res = await crowdfund.methods.balancecheck().call() ;
+  console.log(res);
+}
+useEffect(()=>{
+  getweb3data();
+
+},[]);
+
   return(
       <div className ="main">
     <h1> CrowdFunding</h1>
@@ -11,9 +78,13 @@ function App(){
         Lets utilize Ether and blockchain to fund the needy Project.
       </p>
     </div>
-      <Addproject/>
+      <Addproject 
+      addproject={addproject}/>
       <br/>
-      <Project/>
+      <Project
+      handlefund ={handlefund}
+      balancecheck ={balancecheck}
+      projects ={projects}/>
      
     </div>
   )

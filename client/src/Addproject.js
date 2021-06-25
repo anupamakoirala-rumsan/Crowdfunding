@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {useHistory} from "react-router-dom";
 
-function Addproject(){
+function Addproject(props){
     const [loading ,setLoading]= useState( false)
-    
+    const nameRef = React.useRef();
+    const detailsRef = React.useRef();
+    const goalRef = React.useRef();
+    const dateRef = React.useRef();
     const handleAdd =()=>{
         setLoading(true);
         console.log(loading);
@@ -15,7 +18,7 @@ function Addproject(){
         return(
             <div className="renderbutton">
                 <p>
-                <button onClick={handleAdd} 
+                <button onClick={handleAdd}
                 color="primary"
                 type="submit"> Addproject
 
@@ -28,26 +31,35 @@ function Addproject(){
         if(loading){
             return(
                 <div className="project">
-                     <form onSubmit={handleSubmit}>
+                     <form onSubmit={(event)=>{
+                         event.preventDefault();
+                         const name = nameRef.current.value;
+                         const details = detailsRef.current.value;
+                         const goal = goalRef.current.value;
+                         const date = dateRef.current.value;
+                         props.addproject(name,details,goal,date);
+                         
+                     }}
+                    >
                 <label> Name:</label>
                 <input name="details"
                 type = "text"
-                placeholder="Enter the name of your Project"/>
+                placeholder="Enter the name of your Project" ref={nameRef}/>
                 <br/>
                 <label> Details:</label>
                 <input
                  type ="text"
-                 placeholder="Few Details of your Project"/>
+                 placeholder="Few Details of your Project" ref={detailsRef}/>
                 <br/>
                 <label> Amount to be raised:</label>
                  <input
                  type="Number"
-                 placeholder="In ether"/>
+                 placeholder="In ether" ref={goalRef}/>
                  <br/>
                  <label> Due Date: </label>
                  <input
-                 type = "Date"
-                 placeholder="Date"/>
+                 type = "Number"
+                 placeholder="Date" ref ={dateRef}/>
                  <br/>
                  <button
                  type="submit"
