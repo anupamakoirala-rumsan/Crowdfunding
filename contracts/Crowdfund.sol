@@ -20,7 +20,7 @@ contract Crowdfund{
     mapping(uint => project)  public projects;
     uint counter;
     
-    event Projectcreated( address projectcreator);
+    event Projectcreated( address projectcreator ,string title, string details,uint256 goal, uint deadline);
     event Projectfunded( address fundingaddress, uint256 fundingamount);
    
     constructor(){
@@ -35,7 +35,7 @@ contract Crowdfund{
         require(_duedate>block.timestamp,"Invalid due date");
         counter ++;
         projects[counter] = project(_title, _details ,counter, _goalamount ,0,_duedate, payable(msg.sender),states.start);
-        emit Projectcreated( msg.sender);
+        emit Projectcreated( msg.sender,_title,_details,_goalamount,_duedate);
         
     }
     
