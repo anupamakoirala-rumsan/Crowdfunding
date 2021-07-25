@@ -15,6 +15,7 @@ contract Crowdfund{
         uint256 duedate;
         address  payable creator;
         states state;
+        bool isexist;
     }
     
     mapping(uint => project)  public projects;
@@ -34,7 +35,7 @@ contract Crowdfund{
         require(_goalamount>0,"Invaid amount");
         require(_duedate>block.timestamp,"Invalid due date");
         counter ++;
-        projects[counter] = project(_title, _details ,counter, _goalamount ,0,_duedate, payable(msg.sender),states.start);
+        projects[counter] = project(_title, _details ,counter, _goalamount ,0,_duedate, payable(msg.sender),states.start,true);
         emit Projectcreated( msg.sender,_title,_details,_goalamount,_duedate);
         
     }
@@ -59,7 +60,8 @@ contract Crowdfund{
         uint256 fundraised,
         uint256 duedate,
         address creator, 
-        states state
+        states state,
+        bool isexist
         ){
         require(_id <= counter,"Invalid id");
         title = projects[_id].title;
@@ -70,12 +72,14 @@ contract Crowdfund{
         duedate = projects[_id].duedate;
         creator = projects[_id].creator;
         state = projects[_id].state;
-        return( title, details, id, goalamount,fundraised,duedate,creator,state);
+        isexist = projects[_id].isexist;
+        return( title, details, id, goalamount,fundraised,duedate,creator,state,isexist);
     } 
     //decide whether to close funding or not
     function checkprojecttime(uint _id) public {
         if(block.timestamp >= projects[_id].duedate || projects[_id].fundraised >= projects[_id].goalamount){
             projects[_id].state = states.end;
+            projects[_id].isexist = false;
             transferbalance(_id);
         }
     }
