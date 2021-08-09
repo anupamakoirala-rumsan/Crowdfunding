@@ -36,7 +36,8 @@ function Addproject(props){
                          const name = nameRef.current.value;
                          const details = detailsRef.current.value;
                          const goal = goalRef.current.value;
-                         const date = dateRef.current.value;
+                         let date = dateRef.current.value;
+                         date = parseInt((new Date(date).getTime()/1000).toFixed(0));
                          props.addproject(name,details,goal,date);
                          
                      }}
@@ -58,7 +59,7 @@ function Addproject(props){
                  <br/>
                  <label> Due Date: </label>
                  <input
-                 type = "Number"
+                 type = "Date"
                  placeholder="Date" ref ={dateRef}/>
                  <br/>
                  <button
